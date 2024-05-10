@@ -69,7 +69,17 @@ engine = create_engine(
 session_factory: sessionmaker[Session] = sessionmaker(engine, expire_on_commit=False)
 
 
+def check_data_file_found():
+    if Path(DATA).is_file():
+        return
+    print(f"{DATA} file not found:")
+    print("Probably need to change path or download ")
+    print("https://download.geonames.org/export/zip/allCountries.zip")
+    raise SystemExit(1)
+
+
 def main():
+    check_data_file_found()
     count = 0
     for line in Path(DATA).open():
         count += 1
