@@ -1,5 +1,7 @@
 # geonames
 
+To generate KYC dataset : ./scripts/parse-zip-codes.py
+
 ## ZIP Codes
 
 Source: https://download.geonames.org/export/zip/allCountries.zip

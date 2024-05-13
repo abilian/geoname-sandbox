@@ -21,8 +21,11 @@ import re
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
+from pycountry import countries
+
 DATA = "data/zip-codes.txt"
 RESULT = "data/all_zip_towns.json"
+RESULT_ALPHA3_DIR = "data/towns"
 
 
 def check_data_file_found():
@@ -90,6 +93,24 @@ def split_cc(towns: list) -> dict:
     return results
 
 
+def export_as_splitted_files(towns_per_cc: dict):
+    dest_dir = Path(RESULT_ALPHA3_DIR)
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    # remove existing json files
+    for path in dest_dir.glob("*.json"):
+        path.unlink()
+    # convert to alpha3 and export
+    for cc, values in towns_per_cc.items():
+        country = countries.get(alpha_2=cc)
+        alpha_3 = country.alpha_3
+        path = dest_dir / f"{alpha_3}.json"
+        for item in values:
+            del item["country_code"]
+        path.write_text(
+            json.dumps(values, sort_keys=True, indent=4, ensure_ascii=False)
+        )
+
+
 def main():
     check_data_file_found()
     towns = parse_cc_zip_town()
@@ -112,6 +133,7 @@ def main():
     for item in towns_per_cc["IT"]:
         if item["name"] == "Murano":
             print(item)
+    export_as_splitted_files(towns_per_cc)
 
 
 if __name__ == "__main__":
